@@ -1,52 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.3</version>
-  </parent>
+<!-- 	<parent> -->
+<!-- 		<groupId>org.springframework.boot</groupId> -->
+<!-- 		<artifactId>spring-boot-starter-parent</artifactId> -->
+<!-- 		<version>2.7.3</version> -->
+<!-- 	</parent> -->
 
-  <groupId>github.chenrujun</groupId>
-  <artifactId>azure-spring-boot-issue-889</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+	<groupId>github.chenrujun</groupId>
+	<artifactId>azure-spring-boot-issue-889</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
 
-  <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-  </properties>
+	<properties>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<version.spring.cloud.azure>4.3.0</version.spring.cloud.azure>
+		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
+		<!-- Version 7.10.0.fuse-sb2-7_10_1-00008-redhat-00001 reproduces the error -->
+		<fuse.bom.version.test>7.10.0.fuse-sb2-7_10_1-00008-redhat-00001</fuse.bom.version.test>
+		<!-- Version 7.11.0.fuse-sb2-7_11_0-00028-redhat-00001 resolves the error -->
+<!-- 		<fuse.bom.version.test>7.11.0.fuse-sb2-7_11_0-00028-redhat-00001</fuse.bom.version.test> -->
+	</properties>
+	<repositories>
+		<repository>
+			<id>red-hat-ga-repository</id>
+			<url>https://maven.repository.redhat.com/ga</url>
+		</repository>
+		<repository>
+			<id>red-hat-early-access-repository</id>
+			<url>https://maven.repository.redhat.com/earlyaccess/all</url>
+		</repository>
+		<repository>
+			<id>jboss-early-access-repository</id>
+			<url>https://repository.jboss.org/nexus/content/groups/ea</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>red-hat-ga-repository</id>
+			<url>https://maven.repository.redhat.com/ga</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>red-hat-early-access-repository</id>
+			<url>https://maven.repository.redhat.com/earlyaccess/all</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>jboss-early-access-repository</id>
+			<url>https://repository.jboss.org/nexus/content/groups/ea</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.redhat-fuse</groupId>
+				<artifactId>fuse-springboot-bom</artifactId>
+				<version>${fuse.bom.version.test}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.redhat-fuse</groupId>
-        <artifactId>fuse-springboot-bom</artifactId>
-        <version>7.11.0.fuse-sb2-7_11_0-00028-redhat-00001</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-azure-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
+			<version>${version.spring.cloud.azure}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-resolver-dns-native-macos</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-transport-native-kqueue</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.azure.spring</groupId>
-      <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
-      <version>${version.spring.cloud.azure}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-resolver-dns-native-macos</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
+	<build>
+		<defaultGoal>spring-boot:run</defaultGoal>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*KT.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.redhat-fuse</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${fuse.bom.version.latest}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
