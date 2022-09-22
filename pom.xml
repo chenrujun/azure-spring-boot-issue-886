@@ -116,7 +116,7 @@
 			<plugin>
 				<groupId>org.jboss.redhat-fuse</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${fuse.bom.version.latest}</version>
+				<version>${fuse.bom.version.test}</version>
 				<executions>
 					<execution>
 						<goals>
